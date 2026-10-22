@@ -1,0 +1,37 @@
+name: Build Windows EXE
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  exe:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependensi
+        run: npm install --no-audit --no-fund
+      - name: Build installer dan portable
+        run: npm run dist
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - name: Rilis (tag v* atau jalankan manual)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'terbaru' }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'Gembo Notes (Windows) - build terbaru' }}
+          overwrite_files: true
+          files: |
+            desktop/dist/Gembo-Notes-Setup.exe
+            desktop/dist/Gembo-Notes-Portable.exe

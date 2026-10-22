@@ -1,1 +1,80 @@
-apa itu
+name: Build Android APK
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pastikan google-services.json ada
+        run: |
+          if [ ! -f google-services.json ]; then
+            echo "::error::mobile/google-services.json belum ada."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependensi
+        run: npm install --no-audit --no-fund
+
+      - name: Buat proyek Android
+        run: |
+          npx cap add android
+          cp google-services.json android/app/google-services.json
+
+      - name: Ikon dan splash (merah)
+        run: npx @capacitor/assets generate --android --assetPath assets
+
+      - name: Atur versi dan target SDK
+        run: |
+          sed -i -E 's/targetSdkVersion *= *[0-9]+/targetSdkVersion = 34/' android/variables.gradle
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          sed -i -E "s/versionName \"[^\"]*\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+
+      - name: Sinkron Capacitor
+        run: npx cap sync android
+
+      - name: Pasang plugin notifikasi (WhatsApp dan Telegram)
+        run: python3 android-plugin/patch_android.py android
+
+      - name: Build release
+        working-directory: mobile/android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Tanda tangan APK
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          UNSIGNED=android/app/build/outputs/apk/release/app-release-unsigned.apk
+          "$BT/zipalign" -p -f 4 "$UNSIGNED" aligned.apk
+          "$BT/apksigner" sign --ks "$GITHUB_WORKSPACE/android-signing/debug.keystore" \
+            --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey \
+            --out Gembo-Notes.apk aligned.apk
+          "$BT/apksigner" verify --print-certs Gembo-Notes.apk | head -5
+
+      - name: Rilis (tag v* atau jalankan manual)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'terbaru' }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'Gembo Notes (Android) - build terbaru' }}
+          overwrite_files: true
+          files: mobile/Gembo-Notes.apk
