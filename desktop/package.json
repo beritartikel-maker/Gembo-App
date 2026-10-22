@@ -1,0 +1,44 @@
+{
+  "name": "gembo-notes-desktop",
+  "version": "1.0.0",
+  "description": "Gembo Notes untuk Windows",
+  "author": "Gembo",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis portable --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.gembo.notes",
+    "productName": "Gembo Notes",
+    "files": [
+      "main.js",
+      "preload.js",
+      "offline.html",
+      "build/icon.png"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "Gembo-Notes-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "Gembo-Notes-Portable.${ext}"
+    }
+  }
+}

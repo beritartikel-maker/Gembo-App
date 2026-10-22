@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Masuk ke Gembo Notes</title>
+<style>html,body{height:100%;margin:0}body{display:flex;align-items:center;justify-content:center;background:#F2F5F4;color:#17302F;font-family:system-ui,sans-serif;padding:24px;box-sizing:border-box;text-align:center}
+.b{max-width:380px}.i{width:72px;height:72px;border-radius:20px;background:#D32F2F;margin:0 auto 20px;display:flex;align-items:center;justify-content:center}
+h1{font-size:22px;margin:0 0 8px}p{color:#5E7573;line-height:1.5;margin:0 0 20px}
+button{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border:1.5px solid #D8E1DF;border-radius:12px;background:#fff;color:#17302F;font:700 16px system-ui;cursor:pointer}
+#e{color:#DC2626;margin-top:16px;font-size:14px}</style></head>
+<body><div class="b"><div class="i"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+<h1>Masuk ke Gembo Notes</h1><p>Login dengan akun Google Anda, lalu kembali ke aplikasi Gembo Notes di komputer.</p>
+<button id="go" type="button">Lanjutkan dengan Google</button><div id="e" role="alert"></div></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+const app = initializeApp({ apiKey:"AIzaSyBYrs3oAVbL2yF5IIeZijpov3shN7IPoHM", authDomain:"gembo-notes.firebaseapp.com", projectId:"gembo-notes", appId:"1:899238767564:web:c4f3f4026de87ccc518b69" });
+const q = new URLSearchParams(location.search), port = q.get("port"), state = q.get("state");
+const err = document.getElementById("e");
+if (!/^\d{2,5}$/.test(port || "") || !/^[A-Za-z0-9_-]{16,64}$/.test(state || "")) { err.textContent = "Tautan tidak valid. Mulai lagi dari aplikasi Gembo Notes."; document.getElementById("go").disabled = true; }
+document.getElementById("go").onclick = async () => {
+  err.textContent = "";
+  try {
+    const p = new GoogleAuthProvider(); p.setCustomParameters({ prompt: "select_account" });
+    const r = await signInWithPopup(getAuth(app), p);
+    const c = GoogleAuthProvider.credentialFromResult(r);
+    if (!c) throw new Error("Tidak ada kredensial dari Google.");
+    const u = new URL("http://127.0.0.1:" + port + "/cb");
+    u.search = new URLSearchParams({ state, idToken: c.idToken || "", accessToken: c.accessToken || "" }).toString();
+    location.href = u.toString();
+  } catch (e) { err.textContent = "Gagal masuk: " + (e && e.message ? e.message : e); }
+};
+</script></body></html>

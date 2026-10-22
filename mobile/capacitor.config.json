@@ -1,0 +1,31 @@
+{
+  "appId": "com.gembo.notes",
+  "appName": "Gembo Notes",
+  "webDir": "www",
+  "backgroundColor": "#F2F5F4",
+  "server": {
+    "url": "https://gembo-notes.web.app",
+    "androidScheme": "https",
+    "errorPath": "offline.html"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "adjustMarginsForEdgeToEdge": "disable"
+  },
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": true,
+      "providers": [
+        "google.com"
+      ]
+    },
+    "LocalNotifications": {
+      "iconColor": "#D32F2F"
+    },
+    "SystemBars": {
+      "insetsHandling": "css",
+      "style": "DEFAULT",
+      "hidden": false
+    }
+  }
+}

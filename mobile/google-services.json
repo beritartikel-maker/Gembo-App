@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "899238767564",
+    "project_id": "gembo-notes",
+    "storage_bucket": "gembo-notes.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899238767564:android:925c0325d603df05518b69",
+        "android_client_info": {
+          "package_name": "com.gembo.notes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "899238767564-onffd38v51sd2mkll3nrtmeqhgbbrben.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDA2DYxv-vhBkLktTOe5soVj1c2DikbxNU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "899238767564-onffd38v51sd2mkll3nrtmeqhgbbrben.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
